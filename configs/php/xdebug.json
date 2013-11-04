@@ -1,0 +1,14 @@
+/**
+ * Documentation: @see http://xdebug.org/docs/all_settings
+ */
+{
+    "id": "xdebug",
+    "idekey": "PHPSTORM",
+    "default_enable": "1",
+    "remote_enable": "1",
+    "remote_handler": "dbgp",
+    "remote_connect_back": "1",
+    "remote_host": "192.168.255.1",
+    "remote_port": "9000",
+    "remote_autostart": "0"
+}

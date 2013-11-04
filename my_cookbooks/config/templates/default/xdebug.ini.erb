@@ -1,0 +1,9 @@
+zend_extension=<%= %x[find /usr/lib/php5 -name 'xdebug.so' 2> /dev/null] %>
+xdebug.idekey=<%= @params['idekey'] %>
+xdebug.default_enable=<%= @params['default_enable'] %>
+xdebug.remote_enable=<%= @params['remote_enable'] %>
+xdebug.remote_handler=<%= @params['remote_handler'] %>
+xdebug.remote_host=<%= @params['remote_host'] %>
+xdebug.remote_connect_back=<%= @params['remote_connect_back'] %>
+xdebug.remote_port=<%= @params['remote_port'] %>
+xdebug.remote_autostart=<%= @params['remote_autostart'] %>

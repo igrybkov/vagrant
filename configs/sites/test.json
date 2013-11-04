@@ -1,0 +1,6 @@
+{
+    "id": "test",
+    "server_name" : "test.local.dev",
+    "server_aliases": ["www.test.local.dev", "test.dev", "www.test.dev"],
+    "allow_override": "All"
+}

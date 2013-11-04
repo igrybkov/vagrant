@@ -1,0 +1,7 @@
+#!upstart
+description "Mailcatcher SMTP dev tool"
+
+start on startup
+stop on shutdown
+
+exec mailcatcher --http-ip="<%= node['mailcatcher']['http_ip'] %>"
