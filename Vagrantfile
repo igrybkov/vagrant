@@ -6,8 +6,6 @@ VAGRANTFILE_API_VERSION = '2'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  #config.vm.box = 'precise64'
-  #config.vm.box_url = 'http://files.vagrantup.com/precise64.box'
   config.vm.box = 'wheezy64'
   config.vm.box_url = 'https://s3-eu-west-1.amazonaws.com/ffuenf-vagrant-boxes/debian/debian-7.2.0-amd64.box'
   config.ssh.forward_agent = true
@@ -31,6 +29,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "1536"]
     vb.customize ["modifyvm", :id, "--cpus", "2"]
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
   end
 
   config.vm.provision :chef_solo do |chef|
@@ -38,13 +37,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.data_bags_path = 'configs'
 
     chef.add_recipe 'apt'
-    chef.add_recipe 'config::before'
     chef.add_recipe 'git'
+    chef.add_recipe 'zsh'
+    chef.add_recipe 'config::before'
+    chef.add_recipe 'config::ohmyzsh'
     #chef.add_recipe 'rvm::vagrant'
     #chef.add_recipe 'rvm::system'
-    #chef.add_recipe 'nodejs'
+    chef.add_recipe "nodejs::install_from_binary"
+    chef.add_recipe "nodejs::npm"
     chef.add_recipe 'tmux'
     chef.add_recipe 'vim'
+    chef.add_recipe 'config::vim'
+
     # Apache2
     chef.add_recipe 'apache2::mod_php5'
     chef.add_recipe 'apache2::default'
@@ -57,11 +61,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe 'php::module_gd'
     chef.add_recipe 'php::module_mysql'
     chef.add_recipe 'php::module_memcache'
+    # chef.add_recipe 'php::module_sqlite3'
     chef.add_recipe 'composer'
     #chef.add_recipe 'mongodb::10gen_repo'
     #chef.add_recipe 'mongodb'
     chef.add_recipe 'config::sites'
-    #chef.add_recipe 'mailcatcher'
+    chef.add_recipe 'phpmyadmin'
+    chef.add_recipe 'phpunit'
+    # chef.add_recipe 'mailcatcher'
     chef.add_recipe 'config::after'
 
     chef.json = {
@@ -89,7 +96,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             :ext_conf_dir => '/etc/php5/mods-available',
             :directives => {
                 'date.timezone' => 'Europe/Kiev'
-            }
+            },
+            :conf_symlinks => [
+                '/etc/php5/apache2',
+                '/etc/php5/cgi',
+                '/etc/php5/cli'
+            ]
         },
         :git => {
             :prefix => '/usr/local'
@@ -109,6 +121,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         },
         :mongodb => {
             :package_version => '2.4.0'
+        },
+        :phpmyadmin => {
+            :fpm => false
         }
     }
   end

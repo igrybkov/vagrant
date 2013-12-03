@@ -1,0 +1,5 @@
+{
+	"id": "ohmyzsh",
+	"theme": "amuse",
+	"plugins": ["git", "cp", "debian", "symfony2", "tmux", "sudo", "ruby", "rake", "npm", "gitignore", "composer", "git-flow-avh"]
+}

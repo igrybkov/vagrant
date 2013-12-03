@@ -1,5 +1,7 @@
 /cookbooks
-#Cheffile.lock
+Cheffile.lock
 .idea
 tmp
 .vagrant
+*.sublime-project
+*.sublime-workspace

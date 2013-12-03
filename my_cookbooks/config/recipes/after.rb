@@ -20,8 +20,29 @@ template node['php']['ext_conf_dir']+'/xdebug.ini' do
   mode 0644
 end
 
-%w(/etc/php5/apache2 /etc/php5/cgi).each do |path|
-  template "#{path}/php.ini" do
+execute 'npm install -g bower' do
+  user 'root'
+end
+
+# Install ruby gems
+%w{ rake mailcatcher }.each do |a_gem|
+  gem_package a_gem
+end
+# Setup MailCatcher
+bash "run mailcatcher" do
+  code "sudo mailcatcher --http-ip 0.0.0.0 --smtp-port 1025"
+  not_if "ps ax | grep -v grep | grep mailcatcher";
+end
+execute 'npm install -g bower --skip-installed' do
+  user 'root'
+  not_if "which bower >/dev/null"
+end
+
+bash "install git-flow-avh" do
+  code "wget --no-check-certificate -q  https://raw.github.com/petervanderdoes/gitflow/develop/contrib/gitflow-installer.sh && bash gitflow-installer.sh install stable; rm gitflow-installer.sh"
+end
+
+template node['php']['conf_dir']+"/php.ini" do
     cookbook 'php'
     source 'php.ini.erb'
     owner 'root'
@@ -30,6 +51,62 @@ end
     variables(:directives => node['php']['directives'])
     notifies :restart, 'service[apache2]'
   end
+
+template node['php']['ext_conf_dir']+"/mailcatcher.ini" do
+  source "mailcatcher.ini.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+  notifies :restart, resources("service[apache2]"), :delayed
+end
+
+
+node['php']['conf_symlinks'].each do |path|
+  configs = [
+    'php.ini'
+  ]
+  extensions = [
+    'mailcatcher.ini'
+  ]
+
+  configs.each do |configFile|
+    linkSource = node['php']['conf_dir']+"/"+configFile
+    linkDestination = "#{path}/#{configFile}"
+
+    link linkDestination do
+      to linkSource
+      not_if { File.exist?(linkDestination) }
+    end
+  end
+
+  extensions.each do |extensionConfigFile|
+    linkSource = node['php']['ext_conf_dir']+"/"+extensionConfigFile
+    linkDestination = "#{path}/conf.d/#{extensionConfigFile}"
+
+    link linkDestination do
+      to linkSource
+      not_if { File.exist?(linkDestination) }
+    end
+  end
+  # template "#{path}/php.ini" do
+  #   cookbook 'php'
+  #   source 'php.ini.erb'
+  #   owner 'root'
+  #   group 'root'
+  #   mode '0644'
+  #   variables(:directives => node['php']['directives'])
+  #   notifies :restart, 'service[apache2]'
+  # end
+  # template "#{path}/conf.d/mailcatcher.ini" do
+  #   source "mailcatcher.ini.erb"
+  #   owner "root"
+  #   group "root"
+  #   mode "0644"
+  #   action :create
+  #   notifies :restart, resources("service[apache2]"), :delayed
+  # end
+
 end
 
 #if node[:phpmyadmin] == true
