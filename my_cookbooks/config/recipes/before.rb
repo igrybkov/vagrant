@@ -23,12 +23,23 @@ end
 #  action :install
 #end
 
+package 'libsqlite3-dev' do
+  action :install
+end
+package 'sqlite3' do
+  action :install
+end
+
 package 'mysql-server' do
   action :install
 end
 
 package 'apache2-mpm-prefork' do
   action :install
+end
+
+%w{ rake }.each do |a_gem|
+  gem_package a_gem
 end
 
 include_recipe 'build-essential'

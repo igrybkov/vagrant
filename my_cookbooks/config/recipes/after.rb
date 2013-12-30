@@ -8,6 +8,41 @@ package 'php5-xdebug' do
   action :install
 end
 
+# Phing
+channel = "pear.phing.info"
+execute "pear channel-discover #{channel}" do
+  not_if "pear list-channels | grep #{channel}"
+end
+execute "pear install --alldeps phing/phing" do
+  not_if "pear list -c phing | grep '^phing '"
+end
+
+# PHPCodeSniffer
+execute "pear install --alldeps PHP_CodeSniffer" do
+  not_if "pear list -c pear | grep '^PHP_CodeSniffer '"
+end
+# PHPCodeSniffer Symfony2 Coding Standard
+git "/usr/share/php/PHP/CodeSniffer/Standards/Symfony2" do
+   repository "https://github.com/opensky/Symfony2-coding-standard.git"
+   action :sync
+end
+bash "Set Symfony2 as default coding standard" do
+  code "sudo phpcs --config-set default_standard Symfony2"
+  # not_if "ps ax | grep -v grep | grep mailcatcher";
+end
+
+package "php5-xsl" do
+  action :install
+end
+
+package "php5-intl" do
+  action :install
+end
+
+package "graphviz" do
+  action :install
+end
+
 xdebug = data_bag_item('php', 'xdebug')
 template node['php']['ext_conf_dir']+'/xdebug.ini' do
   source 'xdebug.ini.erb'
@@ -20,12 +55,12 @@ template node['php']['ext_conf_dir']+'/xdebug.ini' do
   mode 0644
 end
 
-execute 'npm install -g bower' do
+execute 'npm install -g bower less' do
   user 'root'
 end
 
 # Install ruby gems
-%w{ rake mailcatcher }.each do |a_gem|
+%w{ mailcatcher }.each do |a_gem|
   gem_package a_gem
 end
 # Setup MailCatcher
@@ -76,7 +111,8 @@ node['php']['conf_symlinks'].each do |path|
 
     link linkDestination do
       to linkSource
-      not_if { File.exist?(linkDestination) }
+      not_if { linkSource === linkDestination }
+      # not_if { File.exist?(linkDestination) }
     end
   end
 

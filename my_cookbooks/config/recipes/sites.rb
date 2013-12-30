@@ -14,7 +14,7 @@ sites.each do |site|
     server_name opts['server_name']
     server_aliases opts['server_aliases']
     allow_override opts['allow_override']
-    docroot (opts.has_key?('docroot') ? opts['docroot'] : '/home/vagrant/'+opts['id']+'/web')
+    docroot '/home/vagrant/web/'+(opts.has_key?('docroot') ? opts['docroot'] : opts['id']+'/web')
     notifies :restart, 'service[apache2]'
   end
 

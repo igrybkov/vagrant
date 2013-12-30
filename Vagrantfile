@@ -12,19 +12,23 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.network 'private_network', ip: '192.168.255.10'
 
+  # Install plugins
   config.plugin.deps do
     depend 'vagrant-dns', '0.5.0'
     depend 'vagrant-librarian-chef', '0.1.4'
     depend 'vagrant-vbguest', '0.9.0'
+    depend 'vagrant-cachier', '0.5.1'
   end
+
+  config.cache.auto_detect = true
+  config.vbguest.auto_update = true
+  config.vbguest.no_remote = false
 
   config.dns.tld = 'dev'
   config.vm.hostname = 'local'
 
   # Mount shared directories
-  Dir['configs/sites/*'].map { |a| File.basename(a, '.*') }.each do |name|
-    config.vm.synced_folder '../'+name, '/home/vagrant/'+name, nfs: (RUBY_PLATFORM =~ /linux/ or RUBY_PLATFORM =~ /darwin/)
-  end
+  config.vm.synced_folder './web/', '/home/vagrant/web', nfs: (RUBY_PLATFORM =~ /linux/ or RUBY_PLATFORM =~ /darwin/)
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--memory", "1536"]
@@ -68,7 +72,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     chef.add_recipe 'config::sites'
     chef.add_recipe 'phpmyadmin'
     chef.add_recipe 'phpunit'
-    # chef.add_recipe 'mailcatcher'
+    chef.add_recipe 'xhprof'
     chef.add_recipe 'config::after'
 
     chef.json = {
