@@ -15,8 +15,15 @@ Vagrant configuration for web development.
 ## Installation
 * Install [VirtualBox](https://www.virtualbox.org/)
 * Install [Vagrant](http://www.vagrantup.com/)
+* Install plugin dependencies
+
+````sh
+sudo apt-get install build-essential g++
+vagrant plugin install vagrant-plugin-bundler
+````
 * Clone this repo:
     ````git clone git@github.com:igrybkov/vagrant.git````
+* vagrant up
 
 ## Usage
 * Create file for new project in ````configs/sites/````. Use test.json as template
