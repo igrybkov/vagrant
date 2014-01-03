@@ -13,6 +13,7 @@ Vagrant configuration for web development.
 * composer
 
 ## Installation
+* Install [VirtualBox](https://www.virtualbox.org/)
 * Install [Vagrant](http://www.vagrantup.com/)
 * Clone this repo:
     ````git clone git@github.com:igrybkov/vagrant.git````
